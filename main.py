@@ -1,6 +1,8 @@
-from pybaseball import statcast
+from pybaseball import statcast_pitcher
 import numpy as np
 import pandas as pd
 import statsmodels as sm
 
-print(statcast(start_dt="2019-06-24", end_dt="2019-06-25").columns)
+data = statcast_pitcher('2017-07-15', "2017-07-16", player_id = 519242)
+
+data.to_excel('data/testing.xlsx')
