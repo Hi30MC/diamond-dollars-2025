@@ -1,6 +1,7 @@
 import pybaseball as pyb
 import pandas as pd
 import threading as th
+import os
 
 """
 Season Dates:
@@ -40,3 +41,18 @@ def get_all_data_in_season(lookup: dict, season:[str,str], pitcher_ids: [int], t
 def get_all_data(lookup: dict, season_list: [[str, str]], pitcher_ids: [int], toFile: bool = False, cull_vars: [str] = []) -> pd.DataFrame:
     for season in season_list:
         th.Thread(target=get_all_data_in_season, args=(lookup, season, pitcher_ids, toFile, cull_vars)).start()
+
+def get_all_files_in_directory(dir_path: str) -> [str]:
+    file_list = []
+    for item in os.listdir(dir_path):
+        item_path = os.path.join(dir_path, item)
+        if os.path.isfile(item_path):
+            file_list.append(dir_path + "/" + item)
+    return file_list
+
+def get_all_files() -> {str : [str]}:
+    data = {}
+    for yr in os.listdir("data/pitcher_data"):
+        yr_path = "data/pitcher_data/" + yr
+        data.update({yr : get_all_files_in_directory(yr_path)})
+    return data
