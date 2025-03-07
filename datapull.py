@@ -1,14 +1,6 @@
 import pybaseball as pyb
 import pandas as pd
 
-pitcher_info = pd.read_excel("data/pitcherinfo.xlsx")
-
-pitcher_ids = pitcher_info["key_mlbam"]
-pitcher_name= pitcher_info["name_last"] + "_" + pitcher_info["name_first"]
-
-# lookup table that converts MLBAM id's to last_first name
-lookup = {pitcher_ids[i] : pitcher_name[i] for i in range(len(pitcher_ids))}
-
 """
 Season Dates:
 
@@ -22,13 +14,25 @@ All-encompassing dates:
 Feb 14 - Dec 25 (these are arbitrary)
 """
 
-def cull_data(df: DataFrame) -> DataFrame:
-    return df#[[<insert shit here>]]
+def get_pitcher_info():
+    data = pyb.pitching_stats(2022, end_season=None, league='all', qual=1, ind=0)[["IDfg"]]
+    info = pyb.playerid_reverse_lookup(data["IDfg"].values, "fangraphs").sort_values(by="name_last")
+    info.to_excel("data/pitcher_data/pitcherinfo.xlsx", index=False)
 
-season_list = [[j + "-02-14", j+ "-12-25"] for j in [str(i) for i in range(2021, 2025)]]
+def cull_data(df: pd.DataFrame, cull_vars: [str]) -> pd.DataFrame:
+    if cull_vars == []:
+        return df
+    else:
+        return df[cull_vars]
 
-for season in season_list:
-    for id in pitcher_ids:
-        data = cull_data(pyb.statcast_pitcher(season[0], season[1], id))
-        path = "data/pitcher_data/" + season[0][:4] + "/"+lookup[id] + ".xlsx"
+def get_data(season:str, id: int, toFile: bool = False) -> pd.DataFrame:
+    data = cull_data(pyb.statcast_pitcher(season[0], season[1], id))
+    path = "data/pitcher_data/" + season[0][:4] + "/"+lookup[id] + ".xlsx"
+    if toFile:        
         data.to_excel(path)
+    return data
+
+def get_all_data(season_list: [[str, str]], pitcher_ids: [int], toFile: bool = False) -> pd.DataFrame:
+    for season in season_list:
+        for id in pitcher_ids:
+            get_data(season, id, toFile)
