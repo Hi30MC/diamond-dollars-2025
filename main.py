@@ -2,7 +2,7 @@ import pybaseball as pyb
 import numpy as np
 import pandas as pd
 import statsmodels as sm
-import datapull as dp
+import datapullhelper as dp
 
 # init pitcher list, only need to do once, so commented for now to save runtime
 # dp.get_pitcher_info()
@@ -18,9 +18,11 @@ pitcher_name= pitcher_info["name_last"] + "_" + pitcher_info["name_first"]
 lookup = {pitcher_ids[i] : pitcher_name[i] for i in range(len(pitcher_ids))}
 # list of seasons to pull data for
 season_list = [[j + "-02-14", j+ "-12-25"] for j in [str(i) for i in range(2021, 2025)]]
-
+# list of variables to keep (cull_vars)
+cull_vars = "game_date events description zone des type hit_location bb_type balls strikes on_3b on_2b on_1b outs_when_up inning at_bat_number pitch_number home_score away_score".split(" ")
+print(cull_vars)
 # example of how to get data for a single pitcher
-# data = dp.get_data([["2021-02-14", "2021-12-25"]], 521230, False)
+# data = dp.get_data(lookup, [["2021-02-14", "2021-12-25"]], 521230, False, c-ull_vars)
 
 # example of how to get data for all pitchers in a season
-# data = dp.get_all_data(season_list, pitcher_ids, True)
+# data = dp.get_all_data(lookup, season_list, pitcher_ids, True, cull_vars)
