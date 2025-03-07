@@ -1,5 +1,6 @@
 import pybaseball as pyb
 import pandas as pd
+import threading as th
 
 """
 Season Dates:
@@ -32,7 +33,10 @@ def get_data(lookup: dict, season:str, id: int, toFile: bool = False, cull_vars:
         data.to_excel(path)
     return data
 
+def get_all_data_in_season(lookup: dict, season:[str,str], pitcher_ids: [int], toFile: bool = False, cull_vars: [str] = []) -> pd.DataFrame:
+    for id in pitcher_ids:
+            get_data(lookup, season, id, toFile, cull_vars)
+
 def get_all_data(lookup: dict, season_list: [[str, str]], pitcher_ids: [int], toFile: bool = False, cull_vars: [str] = []) -> pd.DataFrame:
     for season in season_list:
-        for id in pitcher_ids:
-            get_data(lookup, season, id, toFile, cull_vars)
+        th.Thread(target=get_all_data_in_season, args=(lookup, season, pitcher_ids, toFile, cull_vars)).start()
