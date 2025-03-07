@@ -30,10 +30,13 @@ cull_vars = "game_date events description zone des type hit_location bb_type bal
 # data = dp.get_all_data(lookup, season_list, pitcher_ids, True, cull_vars)
 
 # example of how to get sheet from dir to var
-# data = pd.read_excel("data/pitcher_data/2021/akin_keegan.xlsx", sheet_name="Sheet1")
+data = pd.read_excel("data/pitcher_data/2021/akin_keegan.xlsx", sheet_name="Sheet1")
 
 # get all files in 2021 directory
 # dp.get_all_files_in_directory("data/pitcher_data/2021")
 
 # get all data file names
 # dp.get_all_files()
+
+
+print(dc.get_chase_percent_season(data))
