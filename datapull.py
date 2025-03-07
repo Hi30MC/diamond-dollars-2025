@@ -22,10 +22,13 @@ All-encompassing dates:
 Feb 14 - Dec 25 (these are arbitrary)
 """
 
+def cull_data(df: DataFrame) -> DataFrame:
+    return df#[[<insert shit here>]]
+
 season_list = [[j + "-02-14", j+ "-12-25"] for j in [str(i) for i in range(2021, 2025)]]
 
 for season in season_list:
     for id in pitcher_ids:
-        data = pyb.statcast_pitcher(season[0], season[1], id)
+        data = cull_data(pyb.statcast_pitcher(season[0], season[1], id))
         path = "data/pitcher_data/" + season[0][:4] + "/"+lookup[id] + ".xlsx"
         data.to_excel(path)
