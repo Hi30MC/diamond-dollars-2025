@@ -59,17 +59,21 @@ def get_lookup(year: int, regen: bool = True) -> pd.DataFrame:
     pitcher_name = info["name_last"] + "_" + info["name_first"]
     return {pitcher_ids[i] : pitcher_name[i] for i in range(len(pitcher_ids))}
 
-def get_all_data(season_list: [[str, str]], cull_vars: [str], force_regen: bool = False) -> None:
+def get_all_data(season_list: [[str, str]], cull_vars: [str], force_regen: bool = False) -> [th.Thread]:
+    threadlist = []
     for season in season_list:
-        th.Thread(target=get_season_data, args=(season, cull_vars, force_regen)).start() # split workers to each year
-
+        t = th.Thread(target=get_season_data, args=(season, cull_vars, force_regen)) # split workers to each year
+        t.start()
+        threadlist.append(t)
+    return threadlist
+        
 def get_season_data(season: [str, str], cull_vars: [str], force_regen: bool = False) -> None:
     # get look up table for names/ids
     year = int(season[0][:4])
     lookup = get_lookup(year, False) #switch to True to regen data
     for id in lookup.keys():
         th.Thread(target=get_pitcher_data, args=(season, id, lookup, cull_vars, force_regen)).start() #split off into per query workers
-        # sleep(0.5) # prevent rate limit if needed
+        sleep(0.25) # prevent rate limit if needed
 
 def get_pitcher_data(season: [str, str], id: int, lookup: dict, cull_vars: [str], force_regen: bool = False) -> None:
     path = f"data/pitcher_data/{season[0][:4]}/{lookup[id]}.xlsx"

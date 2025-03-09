@@ -8,9 +8,13 @@ from timeit import default_timer as dt
 
 # Save
 
-def write_save_files(years: [str]) -> None:
+def write_save_files(years: [str]) -> [th.Thread]:
+    threadlist = []
     for year in years:
-        th.Thread(target=write_save_files_in_year, args=(year,)).start()
+        t = th.Thread(target=write_save_files_in_year, args=(year,))
+        t.start()
+        threadlist.append(t)
+        
 
 def write_save_files_in_year(year: str) -> None:
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
@@ -36,9 +40,13 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
 
 # relief
 
-def write_relief_files(years: [str]) -> None:
+def write_relief_files(years: [str]) -> [th.Thread]:
+    threadlist = []
     for year in years:
-        th.Thread(target=write_relief_files_in_year, args=(year,)).start()
+        t = th.Thread(target=write_relief_files_in_year, args=(year,))
+        t.start()
+        threadlist.append(t)
+    return threadlist
 
 def write_relief_files_in_year(year: str) -> None:
     t0 = dt()
