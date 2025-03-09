@@ -43,39 +43,41 @@ def cull_data(df: pd.DataFrame, cull_vars: [str]) -> pd.DataFrame:
     else:
         return df[cull_vars]
 
+def get_metadata(year: year) -> pd.DataFrame:
+    ids = pyb.pitching_stats(year, end_season=None, league="all", qual=1, ind=0)[["IDfg"]]
+    info = pyb.playerid_reverse_lookup(ids["IDfg"].values, "fangraphs").sort_values(by="name_last")
+    info.to_excel(f"data/pitcher_data/{str(year)}/{str(year)}_pitcher_metadata.xlsx")
+    print("wrote metadata file")
+    return info
+
 def get_lookup(year: int, regen: bool = True) -> pd.DataFrame:
     if regen:
-        ids = pyb.pitching_stats(year, end_season=None, league="all", qual=1, ind=0)[["IDfg"]]
-        info = pyb.playerid_reverse_lookup(ids["IDfg"].values, "fangraphs").sort_values(by="name_last")
-        info.to_excel(f"data/pitcher_data/{str(year)}/{str(year)}_pitcher_metadata.xlsx")
-        print("wrote metadata file")
-        # return info[["key_mlbam", "name_last", "name_first"]]
+        info = get_metadata(year)
     else:
         info = pd.read_excel(f"data/pitcher_data/{str(year)}/{str(year)}_pitcher_metadata.xlsx")
-        # return info[["key_mlbam", "name_last", "name_first"]]
     pitcher_ids = info["key_mlbam"]
     pitcher_name = info["name_last"] + "_" + info["name_first"]
     return {pitcher_ids[i] : pitcher_name[i] for i in range(len(pitcher_ids))}
 
-def get_all_data(season_list: [[str, str]], to_file: bool, cull_vars: [str] = []) -> None:
+def get_all_data(season_list: [[str, str]], cull_vars: [str], force_regen: bool = False) -> None:
     for season in season_list:
-        th.Thread(target=get_season_data, args=(season, to_file, cull_vars)).start() # split workers to each year
+        th.Thread(target=get_season_data, args=(season, cull_vars, force_regen)).start() # split workers to each year
 
-def get_season_data(season: [str, str], to_file: bool, cull_vars: [str] = []) -> None:
+def get_season_data(season: [str, str], cull_vars: [str], force_regen: bool = False) -> None:
     # get look up table for names/ids
     year = int(season[0][:4])
     lookup = get_lookup(year, False) #switch to True to regen data
     for id in lookup.keys():
-        th.Thread(target=get_pitcher_data, args=(season, id, lookup, True, cull_vars)).start() #split off into per query workers
+        th.Thread(target=get_pitcher_data, args=(season, id, lookup, cull_vars, force_regen)).start() #split off into per query workers
         # sleep(0.5) # prevent rate limit if needed
 
-def get_pitcher_data(season: [str, str], id: int, lookup: dict, to_file: bool = True, cull_vars: [str] = []) -> None:
+def get_pitcher_data(season: [str, str], id: int, lookup: dict, cull_vars: [str], force_regen: bool = False) -> None:
     path = f"data/pitcher_data/{season[0][:4]}/{lookup[id]}.xlsx"
-    if os.path.exists(path):
+    if os.path.exists(path) and not force_regen:
         print(f"file {path} exists, passing")
         return 0
     data = cull_data(pyb.statcast_pitcher(season[0], season[1], id), cull_vars)
-    if not os.path.exists(path):
+    if not os.path.exists(path) or force_regen:
         data.to_excel(path)
         print(f"wrote {path}")
         

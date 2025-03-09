@@ -192,7 +192,7 @@ def get_innings_pitched_tot(df: pd.DataFrame) -> int:
 
 """
 
-example triplet
+example quadruplet
 
 def get_stat(df: pd.DataFrame, date: str) -> type:
     day_df = get_culled_df(df, date) 
@@ -207,5 +207,8 @@ def get_stat_per_game(df: pd.DataFrame) -> pd.Series:
 
 def get_stat_tot(df: pd.DataFrame) -> type:
     return get_stat_per_game(df).sum()
+    
+def get_stat_avg(df: pd.DataFrame) -> type:
+    return get_stat_per_game(df).mean()
 """
 

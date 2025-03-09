@@ -32,23 +32,35 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
     
     return pd.DataFrame({"TB": TB, "PC": PC, "dS0": dS0, "dSF": dSF, "K": K, "IP": IP}, index=dates).reset_index(names="date")
 
+# relief
+
 def write_relief_files(years: [str]) -> None:
     for year in years:
-        # th.Thread(target=write_relief_files_in_year, args=(year,)).start()
-        pd.read_excel(f"data/relief_data/{year}.xlsx").drop(pd.read_excel(f"data/relief_data/{year}.xlsx").columns[[0,1]], axis=1).to_excel(f"data/relief_data/{year}.xlsx")
+        th.Thread(target=write_relief_files_in_year, args=(year,)).start()
 
 def write_relief_files_in_year(year: str) -> None:
     t0 = dt()
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
     out = convert_to_relief(files[1], 1, year).rename(files[1].split(".")[0].split("/")[-1]).to_frame()
     for i, file in [*enumerate(files)][2:]:
-        # t = th.Thread(target=lambda out, file, i: out.join(convert_to_relief(file, i).rename(file.split(".")[0].split("/")[-1])), args=(out,file, i)).start()
         d = convert_to_relief(file, i, year).rename(file.split(".")[0].split("/")[-1]).to_frame()
         out = out.join(d)
         if i % 50 == 0:
             print(dt()-t0)
-    out.T.reset_index(names="date").to_excel(f"data/relief_data/{year}.xlsx")
+            
+    # parallelization: not really necessary here so not used
     
+    # threadlist = []
+    # for i, file in [*enumerate(files)][2:]:
+        # t = th.Thread(target=lambda out, file, i: out.join(convert_to_relief(file, i).rename(file.split(".")[0].split("/")[-1])), args=(out,file, i))
+        # t.start
+        # threadlist.append(t)
+    # for i, t in enumerate(threadlist):
+        # t.join()
+        # if i % 50 == 0:
+        #     print(dt()-t0)
+        
+    out.T.reset_index(names="date").to_excel(f"data/relief_data/{year}.xlsx")
 
 def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
     df = pd.read_excel(file_path)
