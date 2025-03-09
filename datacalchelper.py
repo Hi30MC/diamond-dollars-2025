@@ -189,6 +189,20 @@ def get_innings_pitched_per_game(df: pd.DataFrame) -> pd.Series:
 def get_innings_pitched_tot(df: pd.DataFrame) -> int:
     return get_innings_pitched_per_game(df).sum()
 
+# Inning grabber
+
+# IP
+
+def get_inning(df: pd.DataFrame, date: str, init_final: bool) -> int:
+    day_df = get_culled_df(df, date)["inning"]
+    return day_df.iloc[-1] if init_final else day_df.iloc[0]
+    
+def get_inning_per_game(df: pd.DataFrame, init_final: bool) -> pd.Series:
+    dates = get_game_dates(df)
+    data = {}
+    for date in dates:
+        data.update({date : get_inning(df, date, init_final)})
+    return pd.Series(data)
 
 """
 

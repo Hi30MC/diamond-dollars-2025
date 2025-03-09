@@ -43,7 +43,7 @@ def cull_data(df: pd.DataFrame, cull_vars: [str]) -> pd.DataFrame:
     else:
         return df[cull_vars]
 
-def get_metadata(year: year) -> pd.DataFrame:
+def get_metadata(year: str) -> pd.DataFrame:
     ids = pyb.pitching_stats(year, end_season=None, league="all", qual=1, ind=0)[["IDfg"]]
     info = pyb.playerid_reverse_lookup(ids["IDfg"].values, "fangraphs").sort_values(by="name_last")
     info.to_excel(f"data/pitcher_data/{str(year)}/{str(year)}_pitcher_metadata.xlsx")

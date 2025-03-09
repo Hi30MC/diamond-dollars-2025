@@ -29,8 +29,10 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
     dSF = dc.get_init_score_differential_per_game(df)
     K = dc.get_strike_count_per_game(df)
     IP = dc.get_innings_pitched_per_game(df)
+    I0 = dc.get_inning_per_game(df, True)
+    IF = dc.get_inning_per_game(df, False)
     
-    return pd.DataFrame({"TB": TB, "PC": PC, "dS0": dS0, "dSF": dSF, "K": K, "IP": IP}, index=dates).reset_index(names="date")
+    return pd.DataFrame({"TB": TB, "PC": PC, "dS0": dS0, "dSF": dSF, "K": K, "IP": IP, "I0": I0, "IF" : IF}, index=dates).reset_index(names="date")
 
 # relief
 
