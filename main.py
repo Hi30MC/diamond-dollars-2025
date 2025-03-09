@@ -18,7 +18,7 @@ cull_vars = "game_date events description zone des type hit_location bb_type bal
 # dp.get_all_data(season_list=season_list, to_file=True, cull_vars=cull_vars)
 
 parse.write_relief_files("2021 2022 2023 2024".split())
-parse.write_save_files("2021 2022 2023 2024".split())
+# parse.write_save_files("2021 2022 2023 2024".split())
 
 
 

@@ -34,7 +34,8 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
 
 def write_relief_files(years: [str]) -> None:
     for year in years:
-        th.Thread(target=write_relief_files_in_year, args=(year,)).start()
+        # th.Thread(target=write_relief_files_in_year, args=(year,)).start()
+        pd.read_excel(f"data/relief_data/{year}.xlsx").drop(pd.read_excel(f"data/relief_data/{year}.xlsx").columns[[0,1]], axis=1).to_excel(f"data/relief_data/{year}.xlsx")
 
 def write_relief_files_in_year(year: str) -> None:
     t0 = dt()
@@ -46,7 +47,7 @@ def write_relief_files_in_year(year: str) -> None:
         out = out.join(d)
         if i % 50 == 0:
             print(dt()-t0)
-    out.to_excel(f"data/relief_data/{year}.xlsx")
+    out.T.reset_index(names="date").to_excel(f"data/relief_data/{year}.xlsx")
     
 
 def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
