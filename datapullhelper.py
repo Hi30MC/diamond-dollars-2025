@@ -26,7 +26,7 @@ def get_all_files_in_directory(dir_path: str) -> [str]:
         item_path = os.path.join(dir_path, item)
         if os.path.isfile(item_path):
             file_list.append(dir_path + "/" + item)
-    return file_list
+    return sorted(file_list)
 
 def get_all_files() -> {str : [str]}:
     data = {}
@@ -43,16 +43,19 @@ def cull_data(df: pd.DataFrame, cull_vars: [str]) -> pd.DataFrame:
     else:
         return df[cull_vars]
 
-def get_lookup(year: int, to_file: bool = True) -> pd.DataFrame:
-    if to_file:
+def get_lookup(year: int, regen: bool = True) -> pd.DataFrame:
+    if regen:
         ids = pyb.pitching_stats(year, end_season=None, league="all", qual=1, ind=0)[["IDfg"]]
         info = pyb.playerid_reverse_lookup(ids["IDfg"].values, "fangraphs").sort_values(by="name_last")
         info.to_excel(f"data/pitcher_data/{str(year)}/{str(year)}_pitcher_metadata.xlsx")
         print("wrote metadata file")
-        return info[["key_mlbam", "name_last", "name_first"]]
+        # return info[["key_mlbam", "name_last", "name_first"]]
     else:
         info = pd.read_excel(f"data/pitcher_data/{str(year)}/{str(year)}_pitcher_metadata.xlsx")
-        return info[["key_mlbam", "name_last", "name_first"]]
+        # return info[["key_mlbam", "name_last", "name_first"]]
+    pitcher_ids = info["key_mlbam"]
+    pitcher_name = info["name_last"] + "_" + info["name_first"]
+    return {pitcher_ids[i] : pitcher_name[i] for i in range(len(pitcher_ids))}
 
 def get_all_data(season_list: [[str, str]], to_file: bool, cull_vars: [str] = []) -> None:
     for season in season_list:
@@ -61,20 +64,31 @@ def get_all_data(season_list: [[str, str]], to_file: bool, cull_vars: [str] = []
 def get_season_data(season: [str, str], to_file: bool, cull_vars: [str] = []) -> None:
     # get look up table for names/ids
     year = int(season[0][:4])
-    pitcher_info = get_lookup(year, True) # SWITCH TO TRUE IF YOU WANT TO REGEN DATA
-    pitcher_ids = pitcher_info["key_mlbam"]
-    pitcher_name= pitcher_info["name_last"] + "_" + pitcher_info["name_first"]
-    lookup = {pitcher_ids[i] : pitcher_name[i] for i in range(len(pitcher_ids))}
-    for id in pitcher_ids.head():
+    lookup = get_lookup(year, False) #switch to True to regen data
+    for id in lookup.keys():
         th.Thread(target=get_pitcher_data, args=(season, id, lookup, True, cull_vars)).start() #split off into per query workers
-        sleep(0.5) #to prevent rate limit
+        # sleep(0.5) # prevent rate limit if needed
 
-def get_pitcher_data(season: [str, str], id: int, lookup: dict, to_file: bool = True, cull_vars: [str] = []):
-    data = cull_data(pyb.statcast_pitcher(season[0], season[1], id), cull_vars)
+def get_pitcher_data(season: [str, str], id: int, lookup: dict, to_file: bool = True, cull_vars: [str] = []) -> None:
     path = f"data/pitcher_data/{season[0][:4]}/{lookup[id]}.xlsx"
-    if to_file:
+    if os.path.exists(path):
+        print(f"file {path} exists, passing")
+        return 0
+    data = cull_data(pyb.statcast_pitcher(season[0], season[1], id), cull_vars)
+    if not os.path.exists(path):
         data.to_excel(path)
         print(f"wrote {path}")
+        
+def get_missing() -> {str : [str]}:
+    missing = {}
+    for year in os.listdir("data/pitcher_data"):
+        lookup = get_lookup(year, False)
+        missing.update({year:[]})
+        for id in lookup.keys():
+            path = f"data/pitcher_data/{year}/{lookup[id]}.xlsx"
+            if not os.path.exists(path):
+                missing.update({year : missing[year] + [lookup[id]]})
+    return missing
 
 """
 # get the preliminary metadata loaded into variables:
