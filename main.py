@@ -65,4 +65,48 @@ def run_fxn_wait(func_list, args) -> None:
 #         svm.get_s_values(player, year)
     
 
+#get conglomerated s-values
+
+# out = svm.get_s_values_conglomerated(years[0]).rename(years[0]).to_frame()
+# print(out)
+# for year in years[1:]:
+#     out = pd.concat([out, svm.get_s_values_conglomerated(year).rename(year).to_frame()], axis=1) 
+#     print(out)
+# out.to_excel("data/s_vals/conglomerated_s_val_data.xlsx")
 # apply model
+
+data = pd.read_excel("data/s_vals/conglomerated_s_val_data.xlsx", index_col=0)
+
+out = {}
+for col in data.columns:
+    datacol = data[col].dropna()
+    meadian = datacol.median()
+    q3, q1 = np.percentile(datacol, [75 ,25])
+    q3, q1 = q3*1.5, q1*1.5
+    iqr = q3 - q1
+    max = meadian + iqr
+    tot = 0
+    ct = 0
+    for val in datacol:
+        if val < max:
+            ct += 1
+            tot += val
+    out.update({col: [tot/ct, max]})
+means = pd.DataFrame(out).T.rename(columns={0: "mean excl outliers",1: "mean + 1.5iqr"})  
+print(means)
+
+out = {}
+for col in data.columns:
+    datacol = data[col].dropna()
+    mean, max = means.T[col].values
+    
+    ct = 0
+    resids = 0
+    for val in datacol:
+        if val < max:
+            ct += 1
+            resids += (val - mean)**2
+    out.update({col: resids/ct})
+resids = pd.Series(out).rename("stds")
+stats = means.join(resids)
+print(stats)

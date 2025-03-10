@@ -42,3 +42,12 @@ def get_s_vals_one_stat(stat_data: pd.Series, mean: float, std: float, side: str
     p_val = sm._zstat_generic(stat_data, mean, std, side)[1]
     s_val = 1/p_val - 1
     return s_val
+
+def get_s_values_conglomerated(year) -> pd.DataFrame:
+    file_list = dp.get_all_files_in_directory(f"data/s_vals/{year}")
+    out_df = pd.read_excel(file_list[0], index_col=0).T
+    for file in file_list[1:]:
+        player_data = pd.read_excel(file, index_col=0).T
+        out_df = out_df.join(player_data, lsuffix = file[:-5].split("/")[-1][:-11])
+    out_df.T.to_excel(f"data/s_vals/{year}_conglomerated_s_val_data.xlsx")
+    return out_df.T["total"].reset_index(drop=True)
