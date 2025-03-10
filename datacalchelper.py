@@ -79,7 +79,7 @@ def get_chase_percent_per_game(df: pd.DataFrame) -> pd.Series:
 def get_chase_percent_season(df: pd.DataFrame) -> float:
     return get_chase_percent_per_game(df).mean()
 
-# K
+# strike count
 def get_strike_count(df: pd.DataFrame, date: str) -> int:
     day_df = get_culled_df(df, date).loc[df["type"] == "S"].loc[df["description"] != "foul"]
     return len(day_df)
@@ -93,6 +93,22 @@ def get_strike_count_per_game(df: pd.DataFrame) -> pd.Series:
 
 def get_strike_count_avg(df: pd.DataFrame) -> float:
     return get_strike_count_per_game(df).mean()
+
+# K count
+
+def get_strikeout_count(df: pd.DataFrame, date: str) -> int:
+    day_df = get_culled_df(df, date).loc[df["events"] == "strikeout"]
+    return len(day_df)
+
+def get_strikeout_count_per_game(df: pd.DataFrame) -> pd.Series:
+    dates = get_game_dates(df)
+    data = {}
+    for date in dates:
+        data.update({date : get_strikeout_count(df, date)})
+    return pd.Series(data)
+
+def get_strike_count_avg(df: pd.DataFrame) -> float:
+    return get_strikeout_count_per_game(df).mean()
 
 # TB
 def get_TB(df: pd.DataFrame, date: str) -> int: 

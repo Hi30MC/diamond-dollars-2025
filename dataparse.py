@@ -32,7 +32,7 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
     PC = dc.get_pitch_count_per_game(df)
     dS0 = dc.get_init_score_differential_per_game(df)
     dSF = dc.get_final_score_differential_per_game(df)
-    K = dc.get_strike_count_per_game(df)
+    K = dc.get_strikeout_count_per_game(df)
     IP = dc.get_innings_pitched_per_game(df)
     I0 = dc.get_inning_per_game(df, True)
     IF = dc.get_inning_per_game(df, False)
@@ -127,7 +127,7 @@ def gen_save_mean_data(years: [str]) -> pd.DataFrame:
         col_data = global_stats[col]
         global_means.update({col: col_data.mean()})
     global_stats = global_stats.T.join(pd.Series(global_means).rename("mean")).T
-    global_stats.to_excel(f"data/calcs/save_calcs/global_mean_data.xlsx")
+    global_stats.T.to_excel(f"data/calcs/save_calcs/global_mean_data.xlsx")
     return global_stats
 
 def gen_save_mean_data_year(year: str) -> pd.Series:
@@ -192,6 +192,6 @@ def gen_save_std_season(year):
         col_data = combined_data.pop(column)
         # print(col_data)
         stds.update({column: col_data.std()})
-    stds = pd.Series(stds).rename(f"{year} stds")    
+    stds = pd.Series(stds).rename(f"{year}")    
     
     return stds

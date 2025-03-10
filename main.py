@@ -53,14 +53,15 @@ def run_fxn_wait(func_list, args) -> None:
 
 # get seasonal stds
 
-print(parse.gen_global_stds_file(years))
+# print(parse.gen_global_stds_file(years))
+
+# print(svm.get_s_values("finnegan_kyle", "2021"))
 
 # get p-value sheets (global stats only)
 
-# for year in years[0:2]:
-#     means = pd.read_excel("data/calcs/save_calcs/global_mean_data.xlsx", index_col= 0).T
-#     players = [*pd.read_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx", index_col=0).index][:-1]
-#     season_mean = means[year]
-#     outdf = 0
+for year in years[2:4]:
+    players = [*pd.read_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx", index_col=0).index][:-1]
+    for player in players:
+        svm.get_s_values(player, year)
     
 # apply model
