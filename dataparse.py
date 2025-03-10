@@ -147,7 +147,7 @@ def gen_save_mean_data_year(year: str) -> pd.Series:
         if name in yf.columns:
             continue
         yf = yf.join(col)
-        print(f"done {year} {name}")
+        # print(f"done {year} {name}")
     yf = yf.T
     year_means = {}
     for col in yf.columns:
@@ -156,8 +156,6 @@ def gen_save_mean_data_year(year: str) -> pd.Series:
     yf = yf.T.join(pd.Series(year_means).rename("mean")).T
     yf.to_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx")
     return yf.T["mean"].rename(year)
-        
-    
 
 def gen_save_mean_data_player(data: pd.DataFrame) -> pd.Series:
     means = {}
@@ -167,3 +165,33 @@ def gen_save_mean_data_player(data: pd.DataFrame) -> pd.Series:
         means.update({column: col_data.mean()})
     # print(means)
     return pd.Series(means)
+
+# stds
+
+def gen_global_stds_file(years):
+    stds = gen_save_std_season(years[0]).to_frame()
+    for year in years[1:]:
+        stds = stds.join(gen_save_std_season(year).to_frame())
+    stds.to_excel(f"data/calcs/save_calcs/global_std_data.xlsx")
+    return stds
+
+def gen_save_std_season(year):
+    lookup = dp.get_lookup(year, regen=False)
+    init_data = pd.read_excel(f"data/save_data/{year}/{[*lookup.values()][0]}.xlsx", index_col=0)
+    combined_data = init_data.loc[init_data["IF"] == 9][[*init_data.columns[1:]]].T
+    for i, name in enumerate([*lookup.values()][1:]):
+        print(f"done std {year} {name}")
+        p = pd.read_excel(f"data/save_data/{year}/{name}.xlsx", index_col=0)
+        combined_data = combined_data.join(p.loc[p["IF"] == 9][[*p.columns[1:]]].T, lsuffix=name+str(i))
+    combined_data = combined_data.T.reset_index()
+    # print(combined_data)
+    # combined_data[[*combined_data.columns[2:]]].to_excel(f"data/pvals/{year}_combined_data.xlsx")
+
+    stds = {}
+    for column in combined_data.columns[1:]:
+        col_data = combined_data.pop(column)
+        # print(col_data)
+        stds.update({column: col_data.std()})
+    stds = pd.Series(stds).rename(f"{year} stds")    
+    
+    return stds

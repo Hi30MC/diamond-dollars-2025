@@ -48,8 +48,19 @@ def run_fxn_wait(func_list, args) -> None:
 
 # get global means
 
-print(parse.gen_relief_mean_data(years))
-
+# print(parse.gen_relief_mean_data(years))
 # print(parse.gen_save_mean_data(years))
 
+# get seasonal stds
+
+print(parse.gen_global_stds_file(years))
+
+# get p-value sheets (global stats only)
+
+# for year in years[0:2]:
+#     means = pd.read_excel("data/calcs/save_calcs/global_mean_data.xlsx", index_col= 0).T
+#     players = [*pd.read_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx", index_col=0).index][:-1]
+#     season_mean = means[year]
+#     outdf = 0
+    
 # apply model

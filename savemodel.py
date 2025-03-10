@@ -7,3 +7,9 @@ import datacalchelper as dc
 import dataparse as parse
 import threading as th
 
+def get_p_values(name: str) -> pd.DataFrame:
+    
+    
+    return 0
+
+    
