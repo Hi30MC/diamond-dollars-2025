@@ -14,7 +14,6 @@ def get_s_values(name: str, year) -> pd.DataFrame:
     player_data = player_data.loc[player_data["IF"] == 9].loc[player_data["I0"] != 1].set_index("date").T
     if len(player_data.columns) == 0:
         return -1
-    # print(player_data.T)
     out_df = get_s_vals_one_game(player_data[player_data.columns[0]], smean, sstd).rename(player_data.columns[0]).to_frame()
     for date in player_data.columns[1:]:
         out_df = out_df.join(get_s_vals_one_game(player_data[date], smean, sstd).rename(date))
@@ -28,18 +27,18 @@ def get_s_values(name: str, year) -> pd.DataFrame:
     print(f"done sval {year} {name}")
     return out_df.T["total"]
 
-def get_s_vals_one_game(game_data, smean, sstd):
+def get_s_vals_one_game(game_data: pd.Series, smean: float, sstd: float) -> pd.Series:
     pos_vars = ["TB"] #want lower, so left
     neg_vars = ["dS0", "dSF", "K", "IP"] #want higher, so right
     
-    s_val_dict = {"TB": get_s_vals_one_stat(game_data["TB"], smean["TB"], sstd["TB"], "smaller")}
+    s_val_series = {"TB": get_s_vals_one_stat(game_data["TB"], smean["TB"], sstd["TB"], "smaller")}
     for var in neg_vars:
-        s_val_dict.update({var: get_s_vals_one_stat(game_data[var], smean[var], sstd[var], "larger")})
-    s_val_dict = pd.Series(s_val_dict)
-    return s_val_dict
+        s_val_series.update({var: get_s_vals_one_stat(game_data[var], smean[var], sstd[var], "larger")})
+    s_val_series = pd.Series(s_val_series)
+    return s_val_series
     
     
-def get_s_vals_one_stat(stat_data: pd.Series, mean, std, side):
+def get_s_vals_one_stat(stat_data: pd.Series, mean: float, std: float, side: str) -> float:
     p_val = sm._zstat_generic(stat_data, mean, std, side)[1]
     s_val = 1/p_val - 1
     return s_val

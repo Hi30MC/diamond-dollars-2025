@@ -10,7 +10,6 @@ import threading as th
 import reliefmodel as rlm
 import savemodel as svm
 
-
 #meta-meta data 
 years = "2021 2022 2023 2024".split()
 season_list = [[f"{y}-02-14", f"{y}-12-25"] for y in years]
@@ -29,15 +28,18 @@ def run_fxn_wait(func_list, args) -> None:
 # for year in years:
 #     dp.get_metadata(year)
 
+
+# get missing if needed
 # print(dp.get_missing())
+
 
 # regen all raw data
 # run_fxn_wait([dp.get_all_data], (season_list, cull_vars, True))
 
+
 # grab missing/not force regen
 # run_fxn_wait([dp.get_all_data], (season_list, cull_vars, False))
 
-# dp.get_pitcher_data(season_list[2], 621237, dp.get_lookup("2023", False), cull_vars, True)
 
 # parse data, only run when needed, wait until done to model etc
 # run_fxn_wait([parse.write_relief_files], (years,))
@@ -55,13 +57,12 @@ def run_fxn_wait(func_list, args) -> None:
 
 # print(parse.gen_global_stds_file(years))
 
-# print(svm.get_s_values("finnegan_kyle", "2021"))
-
 # get p-value sheets (global stats only)
 
-for year in years[2:4]:
-    players = [*pd.read_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx", index_col=0).index][:-1]
-    for player in players:
-        svm.get_s_values(player, year)
+# for year in years:
+#     players = [*pd.read_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx", index_col=0).index][:-1]
+#     for player in players:
+#         svm.get_s_values(player, year)
     
+
 # apply model

@@ -15,7 +15,6 @@ def write_save_files(years: [str]) -> [th.Thread]:
         t.start()
         threadlist.append(t)
     return threadlist
-        
 
 def write_save_files_in_year(year: str) -> None:
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
@@ -44,7 +43,6 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
 def write_relief_files(years: [str]) -> [th.Thread]:
     threadlist = []
     for year in years:
-        # write_relief_files_in_year(year)
         t = th.Thread(target=write_relief_files_in_year, args=(year,))
         t.start()
         threadlist.append(t)
@@ -75,7 +73,6 @@ def write_relief_files_in_year(year: str) -> None:
     out.T.reset_index(names="date").to_excel(f"data/relief_data/{year}.xlsx")
 
 def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
-    # print(file_path)
     df = pd.read_excel(file_path)
     dates = dc.get_game_dates(df)
     TBpg = dc.get_TB_avg(df)
@@ -134,20 +131,16 @@ def gen_save_mean_data_year(year: str) -> pd.Series:
     lookup = dp.get_lookup(year, regen=False)
     init_data = pd.read_excel(f"data/save_data/{year}/{[*lookup.values()][0]}.xlsx")
     yf = gen_save_mean_data_player(init_data.loc[init_data["IF"] == 9]).rename([*lookup.values()][0]).to_frame()
-    # yf = pd.DataFrame()
-    # print([*lookup.values()])
+
     for name in [*lookup.values()][1:]:
-        # print(name)
         data = pd.read_excel(f"data/save_data/{year}/{name}.xlsx")
         data = data.loc[data["IF"] == 9]
         if len(data["TB"]) == 0:
-            # print(name)
             continue
         col = gen_save_mean_data_player(data).rename(name).to_frame()
         if name in yf.columns:
             continue
         yf = yf.join(col)
-        # print(f"done {year} {name}")
     yf = yf.T
     year_means = {}
     for col in yf.columns:
@@ -161,21 +154,19 @@ def gen_save_mean_data_player(data: pd.DataFrame) -> pd.Series:
     means = {}
     for column in data.columns[2:]:
         col_data = data.pop(column)
-        # print(col_data)
         means.update({column: col_data.mean()})
-    # print(means)
     return pd.Series(means)
 
 # stds
 
-def gen_global_stds_file(years):
+def gen_global_stds_file(years: [str]) -> pd.DataFrame:
     stds = gen_save_std_season(years[0]).to_frame()
     for year in years[1:]:
         stds = stds.join(gen_save_std_season(year).to_frame())
     stds.to_excel(f"data/calcs/save_calcs/global_std_data.xlsx")
     return stds
 
-def gen_save_std_season(year):
+def gen_save_std_season(year: str) -> pd.Series:
     lookup = dp.get_lookup(year, regen=False)
     init_data = pd.read_excel(f"data/save_data/{year}/{[*lookup.values()][0]}.xlsx", index_col=0)
     combined_data = init_data.loc[init_data["IF"] == 9][[*init_data.columns[1:]]].T
@@ -184,13 +175,10 @@ def gen_save_std_season(year):
         p = pd.read_excel(f"data/save_data/{year}/{name}.xlsx", index_col=0)
         combined_data = combined_data.join(p.loc[p["IF"] == 9][[*p.columns[1:]]].T, lsuffix=name+str(i))
     combined_data = combined_data.T.reset_index()
-    # print(combined_data)
-    # combined_data[[*combined_data.columns[2:]]].to_excel(f"data/pvals/{year}_combined_data.xlsx")
 
     stds = {}
     for column in combined_data.columns[1:]:
         col_data = combined_data.pop(column)
-        # print(col_data)
         stds.update({column: col_data.std()})
     stds = pd.Series(stds).rename(f"{year}")    
     
