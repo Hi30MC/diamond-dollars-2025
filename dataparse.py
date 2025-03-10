@@ -14,13 +14,14 @@ def write_save_files(years: [str]) -> [th.Thread]:
         t = th.Thread(target=write_save_files_in_year, args=(year,))
         t.start()
         threadlist.append(t)
+    return threadlist
         
 
 def write_save_files_in_year(year: str) -> None:
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
     for i, file in [*enumerate(files)][1:]:
         t = convert_to_save(file)
-        t.to_excel(f"data/save_data/{year}/{file.split(".")[0].split("/")[-1]}.xlsx")
+        t.to_excel(f"data/save_data/{year}/{file[:-5].split("/")[-1]}.xlsx")
         print(f"done save {year} {i}")
     print(f"done save {year}")
 
@@ -30,7 +31,7 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
     TB = dc.get_TB_per_game(df)
     PC = dc.get_pitch_count_per_game(df)
     dS0 = dc.get_init_score_differential_per_game(df)
-    dSF = dc.get_init_score_differential_per_game(df)
+    dSF = dc.get_final_score_differential_per_game(df)
     K = dc.get_strike_count_per_game(df)
     IP = dc.get_innings_pitched_per_game(df)
     I0 = dc.get_inning_per_game(df, True)
@@ -43,6 +44,7 @@ def convert_to_save(file_path:str) -> pd.DataFrame():
 def write_relief_files(years: [str]) -> [th.Thread]:
     threadlist = []
     for year in years:
+        # write_relief_files_in_year(year)
         t = th.Thread(target=write_relief_files_in_year, args=(year,))
         t.start()
         threadlist.append(t)
@@ -51,9 +53,9 @@ def write_relief_files(years: [str]) -> [th.Thread]:
 def write_relief_files_in_year(year: str) -> None:
     t0 = dt()
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
-    out = convert_to_relief(files[1], 1, year).rename(files[1].split(".")[0].split("/")[-1]).to_frame()
+    out = convert_to_relief(files[1], 1, year).rename(files[1][:-5].split("/")[-1]).to_frame()
     for i, file in [*enumerate(files)][2:]:
-        d = convert_to_relief(file, i, year).rename(file.split(".")[0].split("/")[-1]).to_frame()
+        d = convert_to_relief(file, i, year).rename(file[:-5].split("/")[-1]).to_frame()
         out = out.join(d)
         if i % 50 == 0:
             print(dt()-t0)
@@ -73,6 +75,7 @@ def write_relief_files_in_year(year: str) -> None:
     out.T.reset_index(names="date").to_excel(f"data/relief_data/{year}.xlsx")
 
 def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
+    # print(file_path)
     df = pd.read_excel(file_path)
     dates = dc.get_game_dates(df)
     TBpg = dc.get_TB_avg(df)
@@ -87,3 +90,80 @@ def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
 
     print(f"finished relief {year} {i}")
     return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "chase%/G": chasePpg, "strike/G": strikepg, "dS0/G": dS0pg, "dSF/G": dSFpg})
+
+# Global statistic calc (relief) save to data/relief_data/global_mean_data (rows are years)
+
+def gen_relief_mean_data(years: [str]) -> pd.DataFrame:
+    out = gen_relief_mean_data_year(years[0]).rename(years[0]).to_frame()
+    for year in years[1:]:
+        out = out.join(gen_relief_mean_data_year(year).to_frame())
+    global_stats = out.T
+    global_means = {}
+    for col in global_stats.columns:
+        col_data = global_stats[col]
+        global_means.update({col: col_data.mean()})
+    global_stats = global_stats.T.join(pd.Series(global_means).rename("mean")).T
+    global_stats.to_excel(f"data/calcs/relief_calcs/global_mean_data.xlsx")
+    return global_stats
+    
+def gen_relief_mean_data_year(year: str) -> pd.Series:
+    data = pd.read_excel(f"data/relief_data/{year}.xlsx")
+    means = {}
+    for column in data.columns[2:]:
+        col_data = data.pop(column)
+        print(col_data)
+        means.update({column: col_data.mean()})
+    return pd.Series(means).rename(year)
+
+# Per-pitcher statistic calc (save_data) save to data/save_data/year/year_mean_data.xlsx (final row should be full mean)
+
+def gen_save_mean_data(years: [str]) -> pd.DataFrame:
+    out = gen_save_mean_data_year(years[0]).to_frame()
+    for year in years[1:]:
+        out = out.join(gen_save_mean_data_year(year).to_frame())
+    global_stats = out.T
+    global_means = {}
+    for col in global_stats.columns:
+        col_data = global_stats[col]
+        global_means.update({col: col_data.mean()})
+    global_stats = global_stats.T.join(pd.Series(global_means).rename("mean")).T
+    global_stats.to_excel(f"data/calcs/save_calcs/global_mean_data.xlsx")
+    return global_stats
+
+def gen_save_mean_data_year(year: str) -> pd.Series:
+    lookup = dp.get_lookup(year, regen=False)
+    init_data = pd.read_excel(f"data/save_data/{year}/{[*lookup.values()][0]}.xlsx")
+    yf = gen_save_mean_data_player(init_data.loc[init_data["IF"] == 9]).rename([*lookup.values()][0]).to_frame()
+    # yf = pd.DataFrame()
+    # print([*lookup.values()])
+    for name in [*lookup.values()][1:]:
+        # print(name)
+        data = pd.read_excel(f"data/save_data/{year}/{name}.xlsx")
+        data = data.loc[data["IF"] == 9]
+        if len(data["TB"]) == 0:
+            # print(name)
+            continue
+        col = gen_save_mean_data_player(data).rename(name).to_frame()
+        if name in yf.columns:
+            continue
+        yf = yf.join(col)
+        print(f"done {year} {name}")
+    yf = yf.T
+    year_means = {}
+    for col in yf.columns:
+        col_data = yf[col]
+        year_means.update({col: col_data.mean()})
+    yf = yf.T.join(pd.Series(year_means).rename("mean")).T
+    yf.to_excel(f"data/calcs/save_calcs/{year}_mean_data.xlsx")
+    return yf.T["mean"].rename(year)
+        
+    
+
+def gen_save_mean_data_player(data: pd.DataFrame) -> pd.Series:
+    means = {}
+    for column in data.columns[2:]:
+        col_data = data.pop(column)
+        # print(col_data)
+        means.update({column: col_data.mean()})
+    # print(means)
+    return pd.Series(means)

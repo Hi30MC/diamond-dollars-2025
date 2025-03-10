@@ -29,15 +29,27 @@ def run_fxn_wait(func_list, args) -> None:
 # for year in years:
 #     dp.get_metadata(year)
 
+# print(dp.get_missing())
+
 # regen all raw data
 # run_fxn_wait([dp.get_all_data], (season_list, cull_vars, True))
 
 # grab missing/not force regen
-run_fxn_wait([dp.get_all_data], (season_list, cull_vars, False))
+# run_fxn_wait([dp.get_all_data], (season_list, cull_vars, False))
+
+# dp.get_pitcher_data(season_list[2], 621237, dp.get_lookup("2023", False), cull_vars, True)
 
 # parse data, only run when needed, wait until done to model etc
-# run_fxn_wait([parse.write_relief_files, parse.write_save_files], (years))
+# run_fxn_wait([parse.write_relief_files], (years,))
+# run_fxn_wait([parse.write_save_files], (years,))
+
 
 # model data
+
+# get global means
+
+print(parse.gen_relief_mean_data(years))
+
+# print(parse.gen_save_mean_data(years))
 
 # apply model

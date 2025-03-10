@@ -50,7 +50,7 @@ def get_metadata(year: str) -> pd.DataFrame:
     print("wrote metadata file")
     return info
 
-def get_lookup(year: int, regen: bool = True) -> pd.DataFrame:
+def get_lookup(year: int, regen: bool = True) -> {str : str}:
     if regen:
         info = get_metadata(year)
     else:
@@ -73,7 +73,7 @@ def get_season_data(season: [str, str], cull_vars: [str], force_regen: bool = Fa
     lookup = get_lookup(year, False) #switch to True to regen data
     for id in lookup.keys():
         th.Thread(target=get_pitcher_data, args=(season, id, lookup, cull_vars, force_regen)).start() #split off into per query workers
-        sleep(0.25) # prevent rate limit if needed
+        sleep(0.5) # prevent rate limit if needed
 
 def get_pitcher_data(season: [str, str], id: int, lookup: dict, cull_vars: [str], force_regen: bool = False) -> None:
     path = f"data/pitcher_data/{season[0][:4]}/{lookup[id]}.xlsx"

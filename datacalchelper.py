@@ -21,8 +21,8 @@ def get_year(df: pd.DataFrame) -> str:
 def get_era(df: pd.DataFrame, date: str) -> float:
     day_df = get_culled_df(df, date)
     score_col = "home_score" if day_df["inning_topbot"].iloc[0] == "Bot" else "away_score"
-    score_diff = day_df[score_col].iloc[0] - day_df[score_col].iloc[-1]
-    inning_diff = day_df["inning"].iloc[0] - day_df["inning"].iloc[-1]+1
+    score_diff = day_df[score_col].max() - day_df[score_col].min()
+    inning_diff = day_df["inning"].max() - day_df["inning"].min()+1
     return score_diff / inning_diff * 9
 
 def get_era_per_game(df: pd.DataFrame) -> pd.Series:
@@ -30,6 +30,7 @@ def get_era_per_game(df: pd.DataFrame) -> pd.Series:
     data = {}
     for date in dates:
         data.update({date : get_era(df, date)})
+    # print(pd.Series(data))
     return pd.Series(data)
 
 def get_era_season(df: pd.DataFrame) -> float:
@@ -177,7 +178,7 @@ def get_final_score_differential_avg(df: pd.DataFrame) -> int:
 
 def get_innings_pitched(df: pd.DataFrame, date: str) -> int:
     day_df = get_culled_df(df, date)["inning"]
-    return day_df.iloc[0]-day_df.iloc[-1] + 1
+    return day_df.max()-day_df.min() + 1
     
 def get_innings_pitched_per_game(df: pd.DataFrame) -> pd.Series:
     dates = get_game_dates(df)
@@ -195,7 +196,7 @@ def get_innings_pitched_tot(df: pd.DataFrame) -> int:
 
 def get_inning(df: pd.DataFrame, date: str, init_final: bool) -> int:
     day_df = get_culled_df(df, date)["inning"]
-    return day_df.iloc[-1] if init_final else day_df.iloc[0]
+    return day_df.min() if init_final else day_df.max()
     
 def get_inning_per_game(df: pd.DataFrame, init_final: bool) -> pd.Series:
     dates = get_game_dates(df)
