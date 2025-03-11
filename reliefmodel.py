@@ -32,6 +32,6 @@ def write_r_scores(years: [str]) -> None:
         stds = year_metadata.loc["std"]
         out = pd.concat([pd.Series({"GP" : row["GP"]} | {stat : 1/[*sm._zstat_generic(row[stat], means[stat], stds[stat], "smaller")][1]-1 for stat in "ERA  TB/G fly_out/G walk/G".split()} | {stat : 1/[*sm._zstat_generic(row[stat], means[stat], stds[stat], "larger")][1]-1 for stat in "K/G chase%/G d2S/G".split()}).rename(i) for i, row in year_data.iterrows()], axis=1).T
         out = out.join(pd.Series({name : sum(out.loc[name]) for name in out.index}).rename("r_score"))
-        out = out.loc[out["GP"]>3]
+        out = out.loc[out["GP"]>10]
         out.to_excel(f"data/model/relief_model/{year}_r_scores_updated.xlsx")
     return None
