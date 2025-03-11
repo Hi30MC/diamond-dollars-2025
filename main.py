@@ -69,3 +69,4 @@ def run_fxn_wait(func_list, args) -> None:
 
 # make global s count sheet w/ totals and %ages
 
+svm.get_s_val_master_sheet(years)

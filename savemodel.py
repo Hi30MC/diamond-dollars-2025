@@ -88,3 +88,20 @@ def update_s_val_sheets(years: [int]) -> None:
             data["Save"] = [1 if x > yr_mu+yr_std else 0 for x in data["sum"]]
             # print(data["Save"].sum(), len(data["Save"]))
             data.to_excel(path)
+            
+def get_s_val_master_sheet(years: [int]) -> None:   
+    master_sheet = pd.concat([pd.Series({dp.path_to_name(path): pd.read_excel(path)["Save"].sum() for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")}).rename(f"{year} Saves") for year in years] + [pd.Series({dp.path_to_name(path): len(pd.read_excel(path)["Save"]) for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")}).rename(f"{year} Save Chances") for year in years], axis=1).fillna(0)
+        # gen mean row
+    
+    means = pd.DataFrame([{col : master_sheet[col].mean() for col in master_sheet.columns}])
+    means.index = ["mean"]
+    
+    # gen std row
+    
+    totals = pd.DataFrame([{col : master_sheet[col].sum() for col in master_sheet.columns}])
+    totals.index = ["total"]
+    
+    master_sheet = pd.concat([master_sheet, means, totals], axis=0)
+    # print(master_sheet)
+    master_sheet.to_excel("data/model/save_counts.xlsx")
+    return None
