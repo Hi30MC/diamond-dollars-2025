@@ -50,16 +50,16 @@ def run_fxn_wait(func_list, args) -> None:
 
 # get global means, get seasonal stds, create combined mu and sigma lookup tables
 
-# for year in years:
-#     svm.get_save_data_year_file(year)
+for year in years:
+    svm.get_save_data_year_file(year)
 
-# svm.get_save_data_global(years)
+svm.get_save_data_global(years)
 
 # get all s-value sheets (global stats only)    
 
-# svm.write_s_vals(years)
+svm.write_s_vals(years)
 
 # get mu, std for s_values
 
-# svm.get_s_val_meta(years)
+svm.get_s_val_meta(years)
 

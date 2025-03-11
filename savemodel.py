@@ -57,6 +57,7 @@ import threading as th
 def get_save_data_year_file(year):
     file_list = dp.get_all_files_in_directory(f"data/save_data/{year}")
     out_df = pd.concat([pd.read_excel(file, index_col=0) for file in file_list], axis=0)
+    out_df = out_df.loc[(out_df["I0"] != 1) & (out_df["IF"] == 9)]
 
     # gen mean row
     
