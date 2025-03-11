@@ -55,7 +55,8 @@ def write_relief_files_in_year(year: str) -> None:
     out = convert_to_relief(files[1], 1, year).rename(files[1][:-5].split("/")[-1]).to_frame()
     for i, file in [*enumerate(files)][2:]:
         d = convert_to_relief(file, i, year).rename(file[:-5].split("/")[-1]).to_frame()
-        out = out.join(d)
+        if not d.empty:
+            out = out.join(d)
         if i % 50 == 0:
             print(dt()-t0)
             
@@ -202,3 +203,4 @@ def gen_save_std_season(year: str) -> pd.Series:
     stds = pd.Series(stds).rename(f"{year}")    
     
     return stds
+

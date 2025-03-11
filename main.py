@@ -42,8 +42,20 @@ def run_fxn_wait(func_list, args) -> None:
 
 
 # parse data, only run when needed, wait until done to model etc
-run_fxn_wait([parse.write_relief_files], (years,))
+parse.write_relief_files_in_year("2024")
+# run_fxn_wait([parse.write_relief_files], (years,))
 # run_fxn_wait([parse.write_save_files], (years,))
+
+# clean relief data
+
+for year in years:
+    data = pd.read_excel(f"data/relief_data/{year}.xlsx", index_col=0)
+    out = data.loc[0].to_frame()
+    for i, row in [*data.iterrows()][1:]: 
+        # print(i,row)
+        if not row.empty:
+            out = out.join(row.to_frame())
+    out.T.to_excel(f"data/relief_data/{year}_clean.xlsx")
 
 
 # Save Model
