@@ -74,7 +74,16 @@ def write_relief_files_in_year(year: str) -> None:
     out.T.reset_index(names="name").to_excel(f"data/relief_data/{year}.xlsx")
 
 def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
-    df = pd.read_excel(file_path)
+    df = pd.read_excel(file_path, index_col=0).set_index("game_date")
+    # print(df.head())
+    # print(df.loc["2021-10-03"]["inning"])
+    # print(df.index)
+    df = df.loc[[df.loc[date]["inning"].iloc[-1] != 1 for date in df.index]].reset_index()
+    # print(df)
+    # df.to_excel("test.xlsx")
+    if df.empty:
+        return pd.Series()
+
     dates = dc.get_game_dates(df)
     TBpg = dc.get_TB_avg(df)
     Kpg = dc.get_play_avg(df, "strikeout")
@@ -96,7 +105,9 @@ def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
 def gen_relief_mean_data(years: [str]) -> pd.DataFrame:
     out = gen_relief_mean_data_year(years[0]).rename(years[0]).to_frame()
     for year in years[1:]:
-        out = out.join(gen_relief_mean_data_year(year).to_frame())
+        row = gen_relief_mean_data_year(year).to_frame()
+        if not row.empty():
+            out = out.join(row)
     global_stats = out.T
     global_means = {}
     for col in global_stats.columns:
