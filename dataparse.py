@@ -78,7 +78,12 @@ def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
     # print(df.head())
     # print(df.loc["2021-10-03"]["inning"])
     # print(df.index)
-    df = df.loc[[df.loc[date]["inning"].iloc[-1] != 1 for date in df.index]].reset_index()
+    valid_games = []
+    for date in df.index:
+        if dc.get_inning(df.reset_index(), date, True) != 1:
+            valid_games.append(date)
+    # print(valid_games)
+    df = df.loc[valid_games].reset_index()
     # print(df)
     # df.to_excel("test.xlsx")
     if df.empty:
