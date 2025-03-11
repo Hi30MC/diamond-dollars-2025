@@ -89,11 +89,11 @@ def run_fxn_wait(func_list, args) -> None:
 
 # get mu std
 
-# rlm.write_mu_std(years)
+rlm.write_mu_std(years)
 
 # get r-score
 
-# rlm.write_r_scores(years)
+rlm.write_r_scores(years)
 
 
 print("you are connected to wlan")
