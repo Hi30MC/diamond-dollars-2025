@@ -21,12 +21,12 @@ Feb 14 - Dec 25 (these are arbitrary)
 #data importing utils
 
 def get_all_files_in_directory(dir_path: str) -> [str]:
-    file_list = []
+    paths = []
     for item in os.listdir(dir_path):
         item_path = os.path.join(dir_path, item)
         if os.path.isfile(item_path):
-            file_list.append(dir_path + "/" + item)
-    return sorted(file_list)
+            paths.append(dir_path + "/" + item)
+    return sorted(paths)
 
 def get_all_files() -> {str : [str]}:
     data = {}
