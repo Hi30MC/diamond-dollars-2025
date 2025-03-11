@@ -42,11 +42,11 @@ def run_fxn_wait(func_list, args) -> None:
 
 
 # parse data, only run when needed, wait until done to model etc
-# run_fxn_wait([parse.write_relief_files], (years,))
+run_fxn_wait([parse.write_relief_files], (years,))
 # run_fxn_wait([parse.write_save_files], (years,))
 
 
-# model data
+# Save Model
 
 # get global means, get seasonal stds, create combined mu and sigma lookup tables
 
@@ -69,4 +69,14 @@ def run_fxn_wait(func_list, args) -> None:
 
 # make global s count sheet w/ totals and %ages
 
-svm.get_s_val_master_sheet(years)
+# svm.get_s_val_master_sheet(years)
+
+# Relief Model
+
+# get mu std
+
+rlm.write_mu_std(years)
+
+# get r-score
+
+rlm.write_r_scores(years)
