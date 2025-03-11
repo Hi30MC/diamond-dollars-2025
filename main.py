@@ -57,7 +57,9 @@ def run_fxn_wait(func_list, args) -> None:
 
 # get all s-value sheets (global stats only)    
 
-svm.write_s_vals(years)
+# svm.write_s_vals(years)
 
 # get mu, std for s_values
+
+# svm.get_s_val_meta(years)
 

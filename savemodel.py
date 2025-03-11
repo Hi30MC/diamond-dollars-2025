@@ -105,3 +105,15 @@ def write_s_vals(years: [str]) -> None:
             # print(s_vals)
             if type(s_vals) != int:
                 s_vals.to_excel(f"data/s_vals/{year}/{dp.path_to_name(path)}.xlsx")
+      
+def get_series_summary(s: pd.Series) -> pd.Series:
+    median, iqr = s.median(), s.quantile(0.75) - s.quantile(0.25)
+    max = s.quantile(0.75) + 1.5 * iqr
+    filtered = s.loc[s < max]
+    mean = filtered.mean()
+    std = filtered.std()
+    return pd.Series({'median': median, "IQR": iqr, "Upper Inner Fence": max, "mu": mean, "std": std})
+    
+def get_s_val_meta(years) -> (float, float):
+    df = pd.concat([get_series_summary(pd.Series([x for y in [pd.read_excel(path)["sum"].values for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")] for x in y])).rename(year) for year in years], axis=1).T
+    df.to_excel("data/calcs/save_calcs/s_val_mu_std.xlsx")
