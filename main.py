@@ -42,7 +42,8 @@ def run_fxn_wait(func_list, args) -> None:
 
 
 # parse data, only run when needed, wait until done to model etc
-run_fxn_wait([parse.write_relief_files], (years,))
+# run_fxn_wait([parse.write_relief_files], (years,))
+# parse.write_relief_files_in_year("2024")
 # run_fxn_wait([parse.write_save_files], (years,))
 
 # print(parse.convert_to_relief("data/pitcher_data/2021/akin_keegan.xlsx", 0, "2021"))
@@ -88,10 +89,10 @@ run_fxn_wait([parse.write_relief_files], (years,))
 
 # get mu std
 
-# rlm.write_mu_std(years)
+rlm.write_mu_std(years)
 
 # get r-score
 
-# rlm.write_r_scores(years)
+rlm.write_r_scores(years)
 
 # print(parse.convert_to_relief("/home/ad/Documents/code/diamond-dollars-2025/data/pitcher_data/2021/finnegan_kyle.xlsx", 0, "2021"))

@@ -56,6 +56,7 @@ def write_relief_files_in_year(year: str) -> None:
     k = 1
     while out.empty:
         out = convert_to_relief(files[k], k, year).rename(files[k][:-5].split("/")[-1]).to_frame()
+        k += 1
     for i, file in [*enumerate(files)][k+1:]:
         d = convert_to_relief(file, i, year).rename(file[:-5].split("/")[-1]).to_frame()
         if not d.empty:
