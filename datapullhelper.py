@@ -35,6 +35,9 @@ def get_all_files() -> {str : [str]}:
         data.update({yr : get_all_files_in_directory(yr_path)})
     return data
 
+def path_to_name(path) -> str:
+    return path[:-5].split("/")[-1]
+
 # data api grab utils
 
 def cull_data(df: pd.DataFrame, cull_vars: [str]) -> pd.DataFrame:
