@@ -42,7 +42,7 @@ def run_fxn_wait(func_list, args) -> None:
 
 
 # parse data, only run when needed, wait until done to model etc
-run_fxn_wait([parse.write_relief_files], (years,))
+# run_fxn_wait([parse.write_relief_files], (years,))
 # run_fxn_wait([parse.write_save_files], (years,))
 
 
@@ -75,7 +75,7 @@ run_fxn_wait([parse.write_relief_files], (years,))
 
 # get mu std
 
-rlm.write_mu_std(years)
+# rlm.write_mu_std(years)
 
 # get r-score
 
