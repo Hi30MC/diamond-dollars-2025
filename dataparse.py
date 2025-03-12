@@ -61,15 +61,16 @@ def write_relief_files_in_year(year: str) -> None:
         out = convert_to_relief(files[k], k, year, era_series).rename(files[k][:-5].split("/")[-1]).to_frame()
         k += 1
     
-    
     for i, file in [*enumerate(files)][k+1:]:
         d = convert_to_relief(file, i, year, era_series).rename(file[:-5].split("/")[-1]).to_frame()
+        # print(d)
         if not d.empty:
             out = out.join(d)
+            # print(out)
         if i % 50 == 0:
             print(dt()-t0)
     
-    pd.concat([out.T.reset_index(names="name"), pyb.pitching_stats(year)["ERA"]]).to_excel(f"data/relief_data/{year}.xlsx")
+    pd.concat([out.T.reset_index(names="name")]).to_excel(f"data/relief_data/{year}.xlsx")
 
 def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
     df = pd.read_excel(path, index_col=0).set_index("game_date")
@@ -92,7 +93,7 @@ def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
     d2Spg = dSFpg - dS0pg
 
 
-    print(f"finished relief {year} {i}")
+    print(f"finished relief {year} {i}", ERA)
     # return pd.Series({"ERA": ERA})
     return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "d2S/G": d2Spg, "GP": num_games})
 
