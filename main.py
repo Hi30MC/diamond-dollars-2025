@@ -84,19 +84,19 @@ run_fxn_wait([parse.write_relief_files], (years,))
 
 # get all s-value sheets (global stats only)    
 
-svm.write_s_vals(years)
+# svm.write_s_vals(years)
 
 # get mu, std for s_values
 
-svm.get_s_val_meta(years)
+# svm.get_s_val_meta(years)
 
 # apply cutoff to s_val sheets (files must exist)
 
-svm.update_s_val_sheets(years)
+# svm.update_s_val_sheets(years)
 
 # make global s count sheet w/ totals and %ages
 
-svm.get_s_val_master_sheet(years)
+# svm.get_s_val_master_sheet(years)
 
 # def get_era_data(year):
 #     # year = 2021
