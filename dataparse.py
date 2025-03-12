@@ -81,7 +81,7 @@ def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
     if df.empty:
         return pd.Series()
 
-    # num_games = dc.get_game_count(df)
+    num_games = dc.get_game_count(df)
     ERA = dc.get_era_season(dp.path_to_name(path), era_series, year)
     TBpg = dc.get_TB_avg(df)
     flyoutpg = dc.get_play_avg(df, "fly_out")
@@ -94,7 +94,7 @@ def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
 
     print(f"finished relief {year} {i}")
     # return pd.Series({"ERA": ERA})
-    return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "chase%/G": chasePpg, "strike/G": strikepg, "d2S/G": d2Spg, "GP": num_games})
+    return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "d2S/G": d2Spg, "GP": num_games})
 
 # Global statistic calc (relief) save to data/relief_data/global_mean_data (rows are years)
 
