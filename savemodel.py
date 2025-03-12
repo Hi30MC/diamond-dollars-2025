@@ -50,9 +50,9 @@ def get_s_vals(path: str, means: pd.Series, stds: pd.Series) -> pd.DataFrame:
 
 def write_s_vals(years: [str]) -> None:
     global_meta = pd.read_excel("data/calcs/save_calcs/global_conglomerate_mu_std.xlsx", index_col=0)
-    for year in years:
+    for year in "2022 2023 2024".split():
         paths = dp.get_all_files_in_directory(f"data/save_data/{year}")
-        year_metadata = global_meta.loc[[f"mu {year}", f"std {year}"]]
+        year_metadata = global_meta.loc[[f"mu {int(year)-1}", f"std {int(year)-1}"]]
         year_metadata.index = ["mu", "std"]
         for path in paths:
             s_vals = get_s_vals(path, year_metadata.loc["mu"], year_metadata.loc["std"])

@@ -22,9 +22,9 @@ def write_mu_std(years: [str]) -> pd.DataFrame():
 
 def write_r_scores(years: [str]) -> None:
     global_meta = pd.read_excel("data/calcs/relief_calcs/season_mu_std.xlsx", index_col=0)
-    for year in years:
+    for year in "2022 2023 2024".split():
         year_data = pd.read_excel(f"data/relief_data/{year}.xlsx", index_col=0).set_index("name")
-        year_metadata = global_meta.loc[[f"{year} mu", f"{year} std"]]
+        year_metadata = global_meta.loc[[f"{int(year)-1} mu", f"{int(year)-1} std"]]
         year_metadata.index = ["mu", "std"]
         means = year_metadata.loc["mu"]
         stds = year_metadata.loc["std"]
