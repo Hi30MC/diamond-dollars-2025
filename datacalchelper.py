@@ -33,8 +33,20 @@ def get_era_per_game(df: pd.DataFrame) -> pd.Series:
     # print(pd.Series(data))
     return pd.Series(data)
 
-def get_era_season(df: pd.DataFrame) -> float:
+def get_era_season(name, lookup) -> float:
     return get_era_per_game(df).mean()
+
+def get_era_lookup(year) -> pd.Series:
+    return pd.Series()
+
+
+
+
+
+
+
+
+
 
 # play type grabber
 

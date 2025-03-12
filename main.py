@@ -9,6 +9,7 @@ import threading as th
 
 import reliefmodel as rlm
 import savemodel as svm
+# from ftfy import fix_encoding()
 
 #meta-meta data 
 years = "2021 2022 2023 2024".split()
@@ -40,6 +41,20 @@ def run_fxn_wait(func_list, args) -> None:
 # grab missing/not force regen
 # run_fxn_wait([dp.get_all_data], (season_list, cull_vars, False))
 
+# used to get era data tables manually
+
+# year = 2024
+
+# data = pyb.pitching_stats_bref(year)[["Name", "ERA"]]#.set_index("Name")
+# data.to_csv(f"{year} test.csv")
+
+# data = pd.read_csv(f"{year} test.csv", encoding="utf-8", index_col=0)
+# print(data[["Name", "ERA"]])
+# data = data[["Name", "ERA"]]
+# data.to_excel(f"data/pitcher_data/{year}_era_data.xlsx")
+
+# Parse to folders
+
 # parse data, only run when needed, wait until done to model etc
 # run_fxn_wait([parse.write_relief_files], (years,))
 # run_fxn_wait([parse.write_save_files], (years,))
@@ -51,8 +66,6 @@ def run_fxn_wait(func_list, args) -> None:
 
 # pyb.pitching_stats_bref(2021).to_excel("2021_season_data.xlsx")
 
-data = pyb.pitching_stats_bref(2021)[["Name", "ERA"]].set_index("Name")["ERA"]
-print(data.to_excel("2021 test.xlsx"))
 
 """
 # clean relief data

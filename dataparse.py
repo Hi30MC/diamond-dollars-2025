@@ -24,8 +24,8 @@ def write_save_files_in_year(year: str) -> None:
         print(f"done save {year} {i}")
     print(f"done save {year}")
 
-def convert_to_save(file_path:str) -> pd.DataFrame():
-    df = pd.read_excel(file_path)
+def convert_to_save(path:str) -> pd.DataFrame():
+    df = pd.read_excel(path)
     dates = dc.get_game_dates(df)
     TB = dc.get_TB_per_game(df)
     PC = dc.get_pitch_count_per_game(df)
@@ -50,16 +50,20 @@ def write_relief_files(years: [str]) -> [th.Thread]:
     return threadlist
 
 def write_relief_files_in_year(year: str) -> None:
-    print(pyb.pitching_stats(year)["name","ERA"])
+    # print(pyb.pitching_stats(year)["name","ERA"])
     t0 = dt()
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
+    era_series = dc.get_era_lookup(year)
+    
     out = pd.Series()
     k = 1
     while out.empty:
-        out = convert_to_relief(files[k], k, year).rename(files[k][:-5].split("/")[-1]).to_frame()
+        out = convert_to_relief(files[k], k, year, era_series).rename(files[k][:-5].split("/")[-1]).to_frame()
         k += 1
+    
+    
     for i, file in [*enumerate(files)][k+1:]:
-        d = convert_to_relief(file, i, year).rename(file[:-5].split("/")[-1]).to_frame()
+        d = convert_to_relief(file, i, year, era_series).rename(file[:-5].split("/")[-1]).to_frame()
         if not d.empty:
             out = out.join(d)
         if i % 50 == 0:
@@ -67,8 +71,8 @@ def write_relief_files_in_year(year: str) -> None:
     
     pd.concat([out.T.reset_index(names="name"), pyb.pitching_stats(year)["ERA"]]).to_excel(f"data/relief_data/{year}_testing.xlsx")
 
-def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
-    df = pd.read_excel(file_path, index_col=0).set_index("game_date")
+def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
+    df = pd.read_excel(path, index_col=0).set_index("game_date")
     valid_games = []
     for date in dc.get_game_dates(df.reset_index()):
         if dc.get_inning(df.reset_index(), date, True) != 1:
@@ -77,18 +81,16 @@ def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
     if df.empty:
         return pd.Series()
 
-    # dates = dc.get_game_dates(df)
+    # num_games = dc.get_game_count(df)
+    ERA = dc.get_era_season(dp.path_to_name(path), era_series)
     # TBpg = dc.get_TB_avg(df)
-    # Kpg = dc.get_play_avg(df, "strikeout")
     # flyoutpg = dc.get_play_avg(df, "fly_out")
     # walkpg = dc.get_play_avg(df, "walk")
-    ERA = dc.get_era_season(df)
-    # chasePpg = dc.get_chase_percent_season(df)
-    # strikepg = dc.get_strike_count_avg(df)
+    # Kpg = dc.get_play_avg(df, "strikeout")
     # dS0pg = dc.get_init_score_differential_avg(df)
     # dSFpg = dc.get_final_score_differential_avg(df)
     # d2Spg = dSFpg - dS0pg
-    # num_games = dc.get_game_count(df)
+
 
     print(f"finished relief {year} {i}")
     return pd.Series({"ERA": ERA})
