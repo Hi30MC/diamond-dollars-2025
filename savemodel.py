@@ -74,8 +74,8 @@ def get_s_val_meta(years: [int]) -> pd.DataFrame:
     
 def update_s_val_sheets(years: [int]) -> None:
     meta = pd.read_excel("data/calcs/save_calcs/s_val_mu_std.xlsx", index_col=0)[["mu", "std"]].T
-    for year in years:
-        paths = dp.get_all_files_in_directory(f"data/s_vals/{year}")
+    for year in years[1:]:
+        paths = dp.get_all_files_in_directory(f"data/s_vals/{str(int(year)-1)}")
         yr_mu = meta[int(year)]["mu"]
         yr_std = meta[int(year)]["std"]
         for path in paths:
