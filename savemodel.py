@@ -74,16 +74,18 @@ def get_s_val_meta(years: [int]) -> pd.DataFrame:
     
 def update_s_val_sheets(years: [int]) -> None:
     meta = pd.read_excel("data/calcs/save_calcs/s_val_mu_std.xlsx", index_col=0)[["mu", "std"]].T
-    for year in years[1:]:
-        paths = dp.get_all_files_in_directory(f"data/s_vals/{str(int(year)-1)}")
-        yr_mu = meta[int(year)]["mu"]
-        yr_std = meta[int(year)]["std"]
+    for year in "2022 2023 2024".split():
+        paths = dp.get_all_files_in_directory(f"data/s_vals/{year}")
+        yr_mu = meta[int(year)-1]["mu"]
+        yr_std = meta[int(year)-1]["std"]
         for path in paths:
             data = pd.read_excel(path, index_col=0)
             data["Save"] = [1 if x > yr_mu+yr_std else 0 for x in data["sum"]]
             data.to_excel(path)
             
 def get_s_val_master_sheet(years: [int]) -> None:   
+    # print({path if "Save" not in pd.read_excel(path).columns else -1 for path in dp.get_all_files_in_directory(f"data/s_vals/{years[3]}")})
+    # return -1
     master_sheet = pd.concat([pd.Series({dp.path_to_name(path): pd.read_excel(path)["Save"].sum() for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")}).rename(f"{year} Saves") for year in years] + [pd.Series({dp.path_to_name(path): len(pd.read_excel(path)["Save"]) for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")}).rename(f"{year} Save Chances") for year in years], axis=1).fillna(0)
     # gen mean row
     

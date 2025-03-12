@@ -77,26 +77,26 @@ def run_fxn_wait(func_list, args) -> None:
 
 # get global means, get seasonal stds, create combined mu and sigma lookup tables
 
-for year in years:
-    svm.get_save_data_year_file(year)
+# for year in years:
+#     svm.get_save_data_year_file(year)
 
-svm.get_save_data_global(years)
+# svm.get_save_data_global(years)
 
 # get all s-value sheets (global stats only)    
 
-svm.write_s_vals(years)
+# svm.write_s_vals(years)
 
 # get mu, std for s_values
 
-svm.get_s_val_meta(years)
+# svm.get_s_val_meta(years)
 
 # apply cutoff to s_val sheets (files must exist)
 
-svm.update_s_val_sheets(years)
+# svm.update_s_val_sheets(years)
 
 # make global s count sheet w/ totals and %ages
 
-svm.get_s_val_master_sheet(years)
+# svm.get_s_val_master_sheet(years)
 
 def get_era_data(year):
     # year = 2021
@@ -144,10 +144,10 @@ def get_missing_era(years):
 
 # get mu std
 
-# rlm.write_mu_std(years)
+rlm.write_mu_std(years)
 
 # get r-score
 
-# rlm.write_r_scores(years)
+rlm.write_r_scores(years)
 
 print("Done!")
