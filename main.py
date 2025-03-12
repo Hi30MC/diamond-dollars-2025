@@ -105,8 +105,29 @@ def run_fxn_wait(func_list, args) -> None:
 
 # svm.get_s_val_master_sheet(years)
 
+paths = dp.get_all_files_in_directory(f"data/pitcher_data/2021")
+names = [dp.path_to_name(path) for path in paths]
+
+converted = []
+for name in names[1:]:
+    last, first = name.split("_")
+    if len(first.split())==1:
+        last, first = last.capitalize(), first.capitalize()
+    else:
+        last, first = last.capitalize(), first.replace(" ", "").upper()
+    converted.append(f"{first} {last}")
+converted = sorted(converted)
+avail = pd.read_excel("data/pitcher_data/2021_era_data.xlsx", index_col=0)["Name"].sort_values()
+
+# print(converted[10])
+
+print(len(converted), len(avail))
+print({name if name not in avail.values else -1 for name in converted})
+    
 
 # Relief Model (works minus era)
+
+# print(dc.get_era_season(name, dc.get_era_lookup(2021)))
 
 # get mu std
 

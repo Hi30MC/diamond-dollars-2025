@@ -33,20 +33,25 @@ def get_era_per_game(df: pd.DataFrame) -> pd.Series:
     # print(pd.Series(data))
     return pd.Series(data)
 
-def get_era_season(name, lookup) -> float:
-    return get_era_per_game(df).mean()
+def get_era_season(name, lookup, year) -> float:
+    print(name)
+    last, first = name.split("_")
+    if len(first.split())==1:
+        last, first = last.capitalize(), first.capitalize()
+    else:
+        last, first = last.capitalize(), first.replace(" ", "").upper()
+    name = f"{first} {last}"
+    if year == "2021":
+        if name == 'Jaime Barría':
+            return 4.64
+        elif name == "J.B. Bukauskas":
+            return 7.89
+    return lookup.loc[name]
 
 def get_era_lookup(year) -> pd.Series:
-    return pd.Series()
-
-
-
-
-
-
-
-
-
+    data = pd.read_excel(f"data/pitcher_data/{year}_era_data.xlsx", index_col=0)
+    out = data.set_index("Name")["ERA"].rename(year)
+    return out
 
 # play type grabber
 

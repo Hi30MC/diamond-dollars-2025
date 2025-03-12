@@ -82,7 +82,7 @@ def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
         return pd.Series()
 
     # num_games = dc.get_game_count(df)
-    ERA = dc.get_era_season(dp.path_to_name(path), era_series)
+    ERA = dc.get_era_season(dp.path_to_name(path), era_series, year)
     # TBpg = dc.get_TB_avg(df)
     # flyoutpg = dc.get_play_avg(df, "fly_out")
     # walkpg = dc.get_play_avg(df, "walk")
