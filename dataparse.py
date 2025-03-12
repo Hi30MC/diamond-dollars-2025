@@ -69,7 +69,7 @@ def write_relief_files_in_year(year: str) -> None:
         if i % 50 == 0:
             print(dt()-t0)
     
-    pd.concat([out.T.reset_index(names="name"), pyb.pitching_stats(year)["ERA"]]).to_excel(f"data/relief_data/{year}_testing.xlsx")
+    pd.concat([out.T.reset_index(names="name"), pyb.pitching_stats(year)["ERA"]]).to_excel(f"data/relief_data/{year}.xlsx")
 
 def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
     df = pd.read_excel(path, index_col=0).set_index("game_date")
@@ -83,18 +83,18 @@ def convert_to_relief(path: str, i: int, year: str, era_series) -> pd.Series():
 
     # num_games = dc.get_game_count(df)
     ERA = dc.get_era_season(dp.path_to_name(path), era_series, year)
-    # TBpg = dc.get_TB_avg(df)
-    # flyoutpg = dc.get_play_avg(df, "fly_out")
-    # walkpg = dc.get_play_avg(df, "walk")
-    # Kpg = dc.get_play_avg(df, "strikeout")
-    # dS0pg = dc.get_init_score_differential_avg(df)
-    # dSFpg = dc.get_final_score_differential_avg(df)
-    # d2Spg = dSFpg - dS0pg
+    TBpg = dc.get_TB_avg(df)
+    flyoutpg = dc.get_play_avg(df, "fly_out")
+    walkpg = dc.get_play_avg(df, "walk")
+    Kpg = dc.get_play_avg(df, "strikeout")
+    dS0pg = dc.get_init_score_differential_avg(df)
+    dSFpg = dc.get_final_score_differential_avg(df)
+    d2Spg = dSFpg - dS0pg
 
 
     print(f"finished relief {year} {i}")
-    return pd.Series({"ERA": ERA})
-    # return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "chase%/G": chasePpg, "strike/G": strikepg, "d2S/G": d2Spg, "GP": num_games})
+    # return pd.Series({"ERA": ERA})
+    return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "chase%/G": chasePpg, "strike/G": strikepg, "d2S/G": d2Spg, "GP": num_games})
 
 # Global statistic calc (relief) save to data/relief_data/global_mean_data (rows are years)
 
