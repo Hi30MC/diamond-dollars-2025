@@ -34,18 +34,11 @@ def get_era_per_game(df: pd.DataFrame) -> pd.Series:
     return pd.Series(data)
 
 def get_era_season(name, lookup, year) -> float:
-    print(name)
     last, first = name.split("_")
-    if len(first.split())==1:
-        last, first = last.capitalize(), first.capitalize()
-    else:
-        last, first = last.capitalize(), first.replace(" ", "").upper()
+    if "." in [*first]:
+        a, b  = first.split()
+        first = a+b
     name = f"{first} {last}"
-    if year == "2021":
-        if name == 'Jaime Barría':
-            return 4.64
-        elif name == "J.B. Bukauskas":
-            return 7.89
     return lookup.loc[name]
 
 def get_era_lookup(year) -> pd.Series:
