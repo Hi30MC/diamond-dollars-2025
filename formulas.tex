@@ -1,0 +1,21 @@
+We first begin by taking the mean and standard deviation across all statstics (TB, ERA, etc.) in a given season:
+
+$$\mu = \frac{\sum x_n}{n}$$
+$$\sigma = \sqrt{\frac{\sum(x_n-\mu)^2}{(n-1)}}$$
+
+From there, we calculate our test statistic and p-value:
+
+$$t = \frac{\mu_{samp} - \mu_{pop}}{\sigma}$$
+
+$p = P(t*_{df}\geq t)$
+
+where we assume our data to be normally distributed with $df$ degrees of freedom.
+
+We then continue by transforming this p-value to prioritize extreme scores (low p-value) and normalize to be from $0$ to $\infty$
+
+$p_{trans} = \frac 1p - 1 = \frac{1-p}{p}$
+
+In our data sheets, we refer to this value as the s-statistic or the r-statistic for save and relief models respectively. Finally, we sum over all statistics, arriving at our combined statistic:
+
+$\boxed{\text{Save}/\text{Relief} = \sum p_{trans}}$
+

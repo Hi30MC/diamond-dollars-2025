@@ -43,15 +43,8 @@ def run_fxn_wait(func_list, args) -> None:
 
 # used to get era data tables manually
 
-# year = 2024
 
 # data = pyb.pitching_stats_bref(year)[["Name", "ERA"]]#.set_index("Name")
-# data.to_csv(f"{year} test.csv")
-
-# data = pd.read_csv(f"{year} test.csv", encoding="utf-8", index_col=0)
-# print(data[["Name", "ERA"]])
-# data = data[["Name", "ERA"]]
-# data.to_excel(f"data/pitcher_data/{year}_era_data.xlsx")
 
 # Parse to folders
 
@@ -105,25 +98,45 @@ def run_fxn_wait(func_list, args) -> None:
 
 # svm.get_s_val_master_sheet(years)
 
-paths = dp.get_all_files_in_directory(f"data/pitcher_data/2021")
-names = [dp.path_to_name(path) for path in paths]
+def get_era_data(year):
+    # year = 2021
+    data = pd.read_excel(f"data/pitcher_data/{year}_era_data.xlsx")
+    data.to_csv(f"{year} test.csv")
 
-converted = []
-for name in names[1:]:
-    last, first = name.split("_")
-    if len(first.split())==1:
-        last, first = last.capitalize(), first.capitalize()
-    else:
-        last, first = last.capitalize(), first.replace(" ", "").upper()
-    converted.append(f"{first} {last}")
-converted = sorted(converted)
-avail = pd.read_excel("data/pitcher_data/2021_era_data.xlsx", index_col=0)["Name"].sort_values()
+    data = pd.read_csv(f"{year} test.csv", encoding="utf-8", index_col=0)
+    # print(data[["Name", "ERA"]])
+    data = data[["Name", "ERA"]]
+    data["Name"] = [s.lower() for s in data["Name"]]
+    print(data.head())
+    data.to_excel(f"{year}_era_data.xlsx")
 
-# print(converted[10])
+    data.to_excel(f"data/pitcher_data/{year}_era_data.xlsx")
 
-print(len(converted), len(avail))
-print({name if name not in avail.values else -1 for name in converted})
-    
+
+
+def get_missing(year):
+    get_era_data(year)
+    paths = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
+    names = [dp.path_to_name(path) for path in paths]
+    converted = []
+    for name in names[1:]:
+        last, first = name.split("_")
+        if "." in [*first]:
+            a, b  = first.split()
+            first = a+b
+        converted.append(f"{first} {last}")
+    converted = sorted(converted)
+    avail = pd.read_excel(f"{year}_era_data.xlsx", index_col=0)["Name"].sort_values()
+    out = pd.Series([name if name not in avail.values else -1 for name in converted])
+    return out.loc[out.values != -1].reset_index(drop=True)
+
+def get_missing_era(years):
+    out = pd.concat([get_missing(year).rename(year) for year in years], axis=1)
+    print(out)
+    return out
+
+get_missing_era(years).to_excel("missing_era.xlsx")
+
 
 # Relief Model (works minus era)
 
