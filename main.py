@@ -40,14 +40,21 @@ def run_fxn_wait(func_list, args) -> None:
 # grab missing/not force regen
 # run_fxn_wait([dp.get_all_data], (season_list, cull_vars, False))
 
-
 # parse data, only run when needed, wait until done to model etc
 # run_fxn_wait([parse.write_relief_files], (years,))
-# parse.write_relief_files_in_year("2024")
 # run_fxn_wait([parse.write_save_files], (years,))
+
+#testing
+# parse.write_relief_files_in_year("2021")
 
 # print(parse.convert_to_relief("data/pitcher_data/2021/akin_keegan.xlsx", 0, "2021"))
 
+# pyb.pitching_stats_bref(2021).to_excel("2021_season_data.xlsx")
+
+data = pyb.pitching_stats_bref(2021)[["Name", "ERA"]].set_index("Name")["ERA"]
+print(data.to_excel("2021 test.xlsx"))
+
+"""
 # clean relief data
 
 # for year in years:
@@ -58,9 +65,9 @@ def run_fxn_wait(func_list, args) -> None:
 #         if not row.empty:
 #             out = out.join(row.to_frame())
 #     out.T.to_excel(f"data/relief_data/{year}_clean.xlsx")
+"""
 
-
-# Save Model
+# Save Model (works fine)
 
 # get global means, get seasonal stds, create combined mu and sigma lookup tables
 
@@ -85,15 +92,15 @@ def run_fxn_wait(func_list, args) -> None:
 
 # svm.get_s_val_master_sheet(years)
 
-# Relief Model
+
+# Relief Model (works minus era)
 
 # get mu std
 
-rlm.write_mu_std(years)
+# rlm.write_mu_std(years)
 
 # get r-score
 
-rlm.write_r_scores(years)
+# rlm.write_r_scores(years)
 
-
-print("you are connected to wlan")
+print("Done!")

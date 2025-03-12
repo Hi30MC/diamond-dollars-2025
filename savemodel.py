@@ -55,10 +55,7 @@ def write_s_vals(years: [str]) -> None:
         year_metadata = global_meta.loc[[f"mu {year}", f"std {year}"]]
         year_metadata.index = ["mu", "std"]
         for path in paths:
-            # print(year, dp.path_to_name(path))
-            # print(get_s_vals("data/save_data/2021/abad_fernando.xlsx", year_metadata.loc["mu"], year_metadata.loc["std"]))
             s_vals = get_s_vals(path, year_metadata.loc["mu"], year_metadata.loc["std"])
-            # print(s_vals)
             if type(s_vals) != int:
                 s_vals.to_excel(f"data/s_vals/{year}/{dp.path_to_name(path)}.xlsx")
       
@@ -77,21 +74,18 @@ def get_s_val_meta(years: [int]) -> pd.DataFrame:
     
 def update_s_val_sheets(years: [int]) -> None:
     meta = pd.read_excel("data/calcs/save_calcs/s_val_mu_std.xlsx", index_col=0)[["mu", "std"]].T
-    # print(meta)
     for year in years:
         paths = dp.get_all_files_in_directory(f"data/s_vals/{year}")
         yr_mu = meta[int(year)]["mu"]
         yr_std = meta[int(year)]["std"]
-        # print(yr_mu, yr_std)
         for path in paths:
             data = pd.read_excel(path, index_col=0)
             data["Save"] = [1 if x > yr_mu+yr_std else 0 for x in data["sum"]]
-            # print(data["Save"].sum(), len(data["Save"]))
             data.to_excel(path)
             
 def get_s_val_master_sheet(years: [int]) -> None:   
     master_sheet = pd.concat([pd.Series({dp.path_to_name(path): pd.read_excel(path)["Save"].sum() for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")}).rename(f"{year} Saves") for year in years] + [pd.Series({dp.path_to_name(path): len(pd.read_excel(path)["Save"]) for path in dp.get_all_files_in_directory(f"data/s_vals/{year}")}).rename(f"{year} Save Chances") for year in years], axis=1).fillna(0)
-        # gen mean row
+    # gen mean row
     
     means = pd.DataFrame([{col : master_sheet[col].mean() for col in master_sheet.columns}])
     means.index = ["mean"]
@@ -102,6 +96,5 @@ def get_s_val_master_sheet(years: [int]) -> None:
     totals.index = ["total"]
     
     master_sheet = pd.concat([master_sheet, means, totals], axis=0)
-    # print(master_sheet)
     master_sheet.to_excel("data/model/save_counts.xlsx")
     return None

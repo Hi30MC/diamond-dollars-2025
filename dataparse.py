@@ -50,6 +50,7 @@ def write_relief_files(years: [str]) -> [th.Thread]:
     return threadlist
 
 def write_relief_files_in_year(year: str) -> None:
+    print(pyb.pitching_stats(year)["name","ERA"])
     t0 = dt()
     files = dp.get_all_files_in_directory(f"data/pitcher_data/{year}")
     out = pd.Series()
@@ -63,52 +64,35 @@ def write_relief_files_in_year(year: str) -> None:
             out = out.join(d)
         if i % 50 == 0:
             print(dt()-t0)
-            
-#     # parallelization: not really necessary here so not used
     
-#     # threadlist = []
-#     # for i, file in [*enumerate(files)][2:]:
-#         # t = th.Thread(target=lambda out, file, i: out.join(convert_to_relief(file, i).rename(file.split(".")[0].split("/")[-1])), args=(out,file, i))
-#         # t.start
-#         # threadlist.append(t)
-#     # for i, t in enumerate(threadlist):
-#         # t.join()
-#         # if i % 50 == 0:
-#         #     print(dt()-t0)
-        
-    out.T.reset_index(names="name").to_excel(f"data/relief_data/{year}.xlsx")
+    pd.concat([out.T.reset_index(names="name"), pyb.pitching_stats(year)["ERA"]]).to_excel(f"data/relief_data/{year}_testing.xlsx")
 
 def convert_to_relief(file_path: str, i: int, year: str) -> pd.Series():
     df = pd.read_excel(file_path, index_col=0).set_index("game_date")
-    # print(df)
-    # print(df.loc["2021-10-03"]["inning"])
-    # print(df.index)
     valid_games = []
     for date in dc.get_game_dates(df.reset_index()):
         if dc.get_inning(df.reset_index(), date, True) != 1:
             valid_games.append(date)
-    # print(valid_games)
     df = df.loc[valid_games].reset_index()
-    # print(df)
-    # df.to_excel("test.xlsx")
     if df.empty:
         return pd.Series()
 
-    dates = dc.get_game_dates(df)
-    TBpg = dc.get_TB_avg(df)
-    Kpg = dc.get_play_avg(df, "strikeout")
-    flyoutpg = dc.get_play_avg(df, "fly_out")
-    walkpg = dc.get_play_avg(df, "walk")
+    # dates = dc.get_game_dates(df)
+    # TBpg = dc.get_TB_avg(df)
+    # Kpg = dc.get_play_avg(df, "strikeout")
+    # flyoutpg = dc.get_play_avg(df, "fly_out")
+    # walkpg = dc.get_play_avg(df, "walk")
     ERA = dc.get_era_season(df)
-    chasePpg = dc.get_chase_percent_season(df)
-    strikepg = dc.get_strike_count_avg(df)
-    dS0pg = dc.get_init_score_differential_avg(df)
-    dSFpg = dc.get_final_score_differential_avg(df)
-    d2Spg = dSFpg - dS0pg
-    num_games = dc.get_game_count(df)
+    # chasePpg = dc.get_chase_percent_season(df)
+    # strikepg = dc.get_strike_count_avg(df)
+    # dS0pg = dc.get_init_score_differential_avg(df)
+    # dSFpg = dc.get_final_score_differential_avg(df)
+    # d2Spg = dSFpg - dS0pg
+    # num_games = dc.get_game_count(df)
 
     print(f"finished relief {year} {i}")
-    return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "chase%/G": chasePpg, "strike/G": strikepg, "d2S/G": d2Spg, "GP": num_games})
+    return pd.Series({"ERA": ERA})
+    # return pd.Series({"ERA": ERA, "TB/G": TBpg, "K/G": Kpg, "fly_out/G": flyoutpg, "walk/G": walkpg, "chase%/G": chasePpg, "strike/G": strikepg, "d2S/G": d2Spg, "GP": num_games})
 
 # Global statistic calc (relief) save to data/relief_data/global_mean_data (rows are years)
 
