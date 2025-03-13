@@ -49,7 +49,7 @@ def run_fxn_wait(func_list, args) -> None:
 # Parse to folders
 
 # parse data, only run when needed, wait until done to model etc
-run_fxn_wait([parse.write_relief_files], (years,))
+# run_fxn_wait([parse.write_relief_files], (years,))
 # run_fxn_wait([parse.write_save_files], (years,))
 
 #testing
@@ -144,10 +144,13 @@ run_fxn_wait([parse.write_relief_files], (years,))
 
 # get mu std
 
-rlm.write_mu_std(years)
+# rlm.write_mu_std(years)
 
 # get r-score
 
-rlm.write_r_scores(years)
+# rlm.write_r_scores(years)
+
+for year in years:
+    pyb.pitching_stats_bref(year).to_excel(f"test/{year}_season_data.xlsx")
 
 print("Done!")
